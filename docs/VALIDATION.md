@@ -2,26 +2,30 @@
 status: active
 owner: AFD 2.0
 last_verified: 2026-10-09
-verified_commit: "adaptive-task-router-0.2.1+afd2.sol61.20261009.1"
+verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
 
 # 本版核验记录
 
-当前版本：`0.2.1+afd2.sol61.20261009.1`。本轮仅优化插件源码、文档和确定性测试，不修改 AFD 业务仓库、用户配置或本机安装。
+当前版本：`0.2.2+afd2.sol61.20261009.1`。本轮仅优化插件源码、文档和确定性测试，不修改 AFD 业务仓库、用户配置或本机安装。
 
 ## 本轮实际执行
 
-在独立 Linux / Python 3.13.5 环境运行：
+在 macOS / Python 3.14.7 环境对完整插件工作副本运行：
 
 ```sh
-python -B -m unittest discover -s tests -p 'test_*.py' -v
+python3 -B -m unittest discover -s tests -p 'test_*.py' -v
+python3 -B tests/check_structure.py
+git diff --check
 ```
 
-27 个 unittest 测试通过，退出码 0；部分测试包含多个子案例。覆盖全部模型选项解析、追加／替换错误型号、未知档位、重复／缺失、围栏示例、损坏清单／YAML、入口开关、缺失文件、包内兄弟引用、越界引用以及 CLI JSON／退出码。测试只在合成临时目录运行，不调用模型或业务。
+30 个 unittest 测试通过，退出码 0；部分测试包含多个子案例。保留全部模型选项、未知档位、重复／缺失、围栏示例、损坏清单／YAML、入口开关、文件及引用边界、CLI JSON／退出码检查；新增首尾竖线四种组合，以及技能正文、清单、选择器中的非允许 Sol 型号拒绝用例。省略开头竖线的错误选项通过真实 CLI 验证，必须退出 1。测试只在合成临时目录运行，不调用模型或业务。
 
-这是本轮实现者自测，不是独立 Pro 复核。机器可读记录见 `docs/revision-validation.json`。本地未通过网络克隆完整仓库，因此不将本地夹具检查称为完整包结构检查；随包 CI 会在完整提交上运行回归、结构检查和差异检查，其状态以对应 GitHub run 为准，不从工作流文件推断通过。
+新回归在修复前运行 30 个测试，出现 10 个失败子案例；修复后全部通过。完整包结构检查通过：16 份文档、35 个本地链接、17 个模型选项，零失败；差异格式检查通过。当前交付文件中的旧 Sol 型号 ID 已清除，测试使用虚构的无效型号；选型、角色覆盖和回退规则均限定 Sol 为 `gpt-6.1-sol`，Astra/Luna 选项保留。历史 Git 提交未重写。
+
+这是本轮实现者自测，不是独立 Pro 复核。机器可读记录见 `docs/revision-validation.json`。随包 CI 在完整提交上运行回归、结构检查和差异检查，其状态须对应最终候选提交的 GitHub run；本文件不提前声称该提交的远端 CI 已通过。
 
 ## 本轮未执行
 
@@ -29,7 +33,9 @@ python -B -m unittest discover -s tests -p 'test_*.py' -v
 
 原生参数已改为按实际 schema 核对；不保证所有客户端具有同一字段。项目授权、写入权及发布围栏继续依赖实际受控入口，行为规则不代替技术隔离。
 
-## 上一候选记录（保留，不能归入本轮）
+## 历史候选记录（保留，不能归入本轮）
+
+上一候选 `0.2.1+afd2.sol61.20261009.1`、提交 `d0e2dd9e26165ffe0fa0af8d6917811467e525ea` 的 27 个回归测试及完整包 CI 已通过；但后续独立复核发现不带开头竖线的错误选项会被漏过。本轮修复该缺口，同时增加 Sol 唯一型号规则，并将容量说明的“计费”更正为“计数”。上一候选的测试不计入本轮 30 个测试的数量。
 
 原候选 `0.2.0+afd2.sol61.20261009.2`、基线提交 `7fd3efb866e6f79cd0d3d14ea282635030cd53c2` 的制作方结果仍保存在 `docs/validation-results.json`：完整包结构记录为 15 文档／27 本地链接／17 选项；三个变异拒绝用例；原生目录查询 installed=false、enabled=false、skills_found=0。
 

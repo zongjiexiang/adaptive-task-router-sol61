@@ -43,8 +43,7 @@ class ModelTableTests(unittest.TestCase):
     def test_appended_invalid_options(self):
         # Unlike the old filter, unknown names remain visible to validation.
         for model, effort in (
-            ("gpt-6-sol", "high"), ("gpt-6.1-so1", "high"),
-            ("other-model", "high"), ("gpt-6.1-sol", "hgh"),
+            ("invalid-model", "high"), ("gpt-6.1-sol", "hgh"),
             ("gpt-6-luna", "ultra"),
         ):
             with self.subTest(model=model, effort=effort):
@@ -53,8 +52,8 @@ class ModelTableTests(unittest.TestCase):
                 self.assertEqual(count, 18)
                 self.assertTrue(any("unknown model option" in error for error in errors))
 
-    def test_replaced_old_model(self):
-        _, errors = validate_model_options(MODEL_TABLE.replace("gpt-6.1-sol", "gpt-6-sol", 1))
+    def test_replaced_unknown_model(self):
+        _, errors = validate_model_options(MODEL_TABLE.replace("gpt-6.1-sol", "invalid-model", 1))
         self.assertTrue(any("unknown" in error for error in errors))
         self.assertTrue(any("missing" in error for error in errors))
 
@@ -72,6 +71,16 @@ class ModelTableTests(unittest.TestCase):
 
     def test_plain_valid_cells(self):
         self.assertEqual(validate_model_options(MODEL_TABLE.replace("`", "")), (17, []))
+
+    def test_optional_border_pipes(self):
+        for leading, trailing in ((True, True), (True, False), (False, True), (False, False)):
+            with self.subTest(leading=leading, trailing=trailing):
+                rows = MODEL_TABLE.splitlines()
+                if not leading:
+                    rows = [line.removeprefix("|") for line in rows]
+                if not trailing:
+                    rows = [line.removesuffix("|") for line in rows]
+                self.assertEqual(validate_model_options("\n".join(rows)), (17, []))
 
     def test_bad_row_shapes(self):
         for extra in ("| `bad` | `high` |", "| `bad` | `high` | x", "| `` | `high` | x |"):
@@ -210,21 +219,62 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.result()["passed"])
 
     def test_extra_bad_option_rejected_at_package_level(self):
-        self.put("skills/route-task/references/model-routing.md", governed(
-            MODEL_TABLE + "| `gpt-6-sol` | `high` | extra |\n"))
-        self.assert_failure("unknown model option")
+        for row in (
+            "| `invalid-model` | `high` | extra |",
+            "`invalid-model` | `high` | extra |",
+            "| `invalid-model` | `high` | extra",
+            "`invalid-model` | `high` | extra",
+        ):
+            with self.subTest(row=row):
+                self.put("skills/route-task/references/model-routing.md", governed(MODEL_TABLE + row + "\n"))
+                self.assert_failure("unknown model option")
 
-    def test_cli_json_and_exit_codes(self):
-        # Run the real main() against this specimen, without modifying the repository.
+    def test_unsupported_sol_references_rejected(self):
+        invalid = "gpt-unsupported-sol"
+        for relative in (
+            "skills/route-task/SKILL.md",
+            ".codex-plugin/plugin.json",
+            "skills/route-task/agents/openai.yaml",
+        ):
+            with self.subTest(relative=relative):
+                path = self.root / relative
+                original = path.read_text()
+                try:
+                    if path.suffix == ".json":
+                        value = json.loads(original)
+                        value["description"] = invalid
+                        self.put_json(relative, value)
+                    elif path.suffix == ".yaml":
+                        value = yaml.safe_load(original)
+                        value["interface"]["default_prompt"] += " " + invalid
+                        self.put(relative, yaml.safe_dump(value))
+                    else:
+                        self.put(relative, original + f"\nUse `{invalid}`.\n")
+                    self.assert_failure(f"{relative}: unsupported Sol model")
+                finally:
+                    path.write_text(original)
+
+    def run_cli(self):
         tests_dir = str(Path(__file__).resolve().parent)
         code = ("import sys; from pathlib import Path; "
                 "sys.path.insert(0, sys.argv[1]); import check_structure as c; "
                 "c.ROOT=Path(sys.argv[2]); raise SystemExit(c.main())")
+        return subprocess.run([sys.executable, "-B", "-c", code, tests_dir, str(self.root)],
+                              capture_output=True, text=True, timeout=10, check=False)
+
+    def test_cli_rejects_option_without_leading_pipe(self):
+        self.put("skills/route-task/references/model-routing.md", governed(
+            MODEL_TABLE + "`invalid-model` | `high` | extra |\n"))
+        run = self.run_cli()
+        self.assertEqual(run.returncode, 1, run.stdout)
+        self.assertFalse(json.loads(run.stdout)["passed"])
+
+    def test_cli_json_and_exit_codes(self):
+        # Run the real main() against this specimen, without modifying the repository.
         for invalid in (False, True):
             if invalid:
                 self.put(".codex-plugin/plugin.json", "{")
-            run = subprocess.run([sys.executable, "-B", "-c", code, tests_dir, str(self.root)],
-                                 capture_output=True, text=True, timeout=10, check=False)
+            run = self.run_cli()
             self.assertEqual(run.returncode, 1 if invalid else 0, run.stderr)
             self.assertEqual(json.loads(run.stdout)["passed"], not invalid)
 

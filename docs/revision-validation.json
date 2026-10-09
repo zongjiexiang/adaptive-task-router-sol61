@@ -1,21 +1,40 @@
 {
-  "version": "0.2.1+afd2.sol61.20261009.1",
-  "base_commit": "7fd3efb866e6f79cd0d3d14ea282635030cd53c2",
+  "version": "0.2.2+afd2.sol61.20261009.1",
+  "base_commit": "d0e2dd9e26165ffe0fa0af8d6917811467e525ea",
   "performed_by": "implementation self-check, not independent review",
   "local_regressions": {
-    "command": "python -B -m unittest discover -s tests -p 'test_*.py' -v",
-    "python": "3.13.5",
-    "platform": "Linux",
-    "tests": 27,
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py' -v",
+    "python": "3.14.7",
+    "platform": "Darwin",
+    "tests": 30,
     "exit_code": 0,
-    "scope": "Deterministic checker tests on synthetic temporary packages. No Codex or business I/O."
+    "scope": "Deterministic checker tests on synthetic temporary packages. No Codex or business I/O.",
+    "before_fix": {
+      "tests": 30,
+      "failed_subcases": 10,
+      "exit_code": 1
+    }
   },
   "local_full_package_check": {
-    "status": "not_run",
-    "reason": "Network clone unavailable in this environment; do not equate fixture checks with full repository audit."
+    "command": "python3 -B tests/check_structure.py",
+    "exit_code": 0,
+    "passed": true,
+    "documents": 16,
+    "local_links": 35,
+    "model_options": 17,
+    "failures": []
+  },
+  "diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0
+  },
+  "sol_policy": {
+    "allowed_model": "gpt-6.1-sol",
+    "obsolete_identifier_matches_in_current_tree": 0,
+    "git_history_rewritten": false
   },
   "remote_ci": {
-    "status": "not_asserted",
+    "status": "not_asserted_at_source_commit",
     "evidence": "Check the workflow run for the final candidate commit."
   },
   "native_scenarios": {
@@ -29,6 +48,6 @@
     "AFD-08": "not_run"
   },
   "runtime_reason": "No native Codex execution or user-host installation performed in this change.",
-  "checker_sha256": "a1be3661961a76f82acbe9909a619ed163a1570c542967d84057a3df0c084df8",
-  "regressions_sha256": "95d3393e62b11c70b6a436a0e6b0cbb231cb8832543c90a202055c5a8172817f"
+  "checker_sha256": "1c8d2d6b11881d8bf70620013449d9a588acdf45baddf2693bdcb49d0967b6d5",
+  "regressions_sha256": "18991c62ee7053a7d903145431e50ec43384241e38c5cb6eca65515d2eea95c5"
 }

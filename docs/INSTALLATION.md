@@ -2,7 +2,7 @@
 status: active
 owner: AFD 2.0
 last_verified: 2026-10-09
-verified_commit: "adaptive-task-router-0.2.1+afd2.sol61.20261009.1"
+verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---

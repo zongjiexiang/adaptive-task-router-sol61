@@ -2,7 +2,7 @@
 status: active
 owner: AFD 2.0
 last_verified: 2026-10-09
-verified_commit: "adaptive-task-router-0.2.1+afd2.sol61.20261009.1"
+verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
@@ -34,7 +34,7 @@ python3 -B tests/check_structure.py
 python3 -B -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-开发依赖按 `requirements-dev.txt` 安装。结构检查覆盖清单、市场、技能入口、包内引用及完整模型表；先解析所有选项再拒绝未知、重复和缺失项。回归测试使用合成临时目录，不调用模型、认证或业务。
+开发依赖按 `requirements-dev.txt` 安装。结构检查覆盖清单、市场、技能入口、包内引用及完整模型表；支持表格首尾竖线省略，先解析全部选项再拒绝未知、重复和缺失项；读取技能、清单与选择器配置时也拒绝其他 Sol 型号。回归测试使用合成临时目录，不调用模型、认证或业务。
 
 CI 执行相同命令及 `git diff --check`。包级检查、单 Skill 验证器、原生加载和实际模型行为是不同结论。详见[核验记录](VALIDATION.md)。
 

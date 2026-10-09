@@ -5,7 +5,7 @@ metadata:
   status: active
   owner: AFD 2.0
   last_verified: "2026-10-09"
-  verified_commit: "adaptive-task-router-0.2.1+afd2.sol61.20261009.1"
+  verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
   applies_to: "adaptive-task-router"
 ---
 
@@ -42,6 +42,8 @@ metadata:
 确有选型需要时读取[模型选型参考](references/model-routing.md)。遇到 Astra XHigh/Max、Ultra 或难以验收的关键判断，再读[高档配置](references/high-effort-orchestration.md)。15 个基础组合和 2 个 Ultra 选项是可调整的起点，不是能力保证。
 
 分别判断求解难度、验证难度、错误影响、上下文依赖和委派净收益。主代理的组织工作、全局推理和最终验证也分别评估；高档主代理不能自动补出子代理遗漏的反例。
+
+子代理的 Sol 型号仅允许 `gpt-6.1-sol`，不得选择或回退到其他 Sol 型号。该型号不可用时，自动选型可在授权与验收允许的 Astra/Luna 选项中调整；用户明确指定时报告缺口。
 
 以当前工具支持的模型与参数为准；配置可能被自定义代理覆盖时定向核对。用户指定的配置与限制优先：明确指定但不支持时说明并让用户改选；自动选型候选不可用时，可采用仍满足验收的支持项并说明调整。无法可靠替代时准确报告缺口，不伪造切换。
 

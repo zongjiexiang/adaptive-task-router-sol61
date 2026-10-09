@@ -22,6 +22,8 @@ def validate_model_options(text: str) -> tuple[int, list[str]]:
 
     This file contains only model tables. New table formats must be introduced
     deliberately rather than silently filtering out unknown model names.
+    Border pipes are optional. Any pipe-containing line outside a fence is
+    checked, so unsupported row syntax cannot silently hide model options.
     Fenced examples are not Markdown tables and do not contribute options.
     """
     options: list[tuple[str, str]] = []
@@ -37,12 +39,10 @@ def validate_model_options(text: str) -> tuple[int, list[str]]:
             elif token[0] == fence[0] and len(token) >= fence[1] and not suffix.strip():
                 fence = None
             continue
-        if fence is not None or not line.startswith("|"):
+        if fence is not None or "|" not in line:
             continue
-        if not line.endswith("|"):
-            failures.append(f"model table line {line_no}: missing closing pipe")
-            continue
-        cells = [cell.strip() for cell in line[1:-1].split("|")]
+        row = line.removeprefix("|").removesuffix("|")
+        cells = [cell.strip() for cell in row.split("|")]
         if all(re.fullmatch(r":?-+:?", cell) for cell in cells):
             continue
         if cells[:2] in (["模型 ID", "推理等级"], ["模型 ID", "模式"]):
@@ -89,10 +89,14 @@ def audit_package(root: Path) -> dict:
             failures.append(f"{relative}: file escapes package")
             return ""
         try:
-            return path.read_text(encoding="utf-8")
+            text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeError) as error:
             failures.append(f"{relative}: {type(error).__name__}")
             return ""
+        for model in sorted(set(re.findall(r"\bgpt-[a-z0-9]+(?:[.-][a-z0-9]+)*\b", text))):
+            if "sol" in model.split("-"):
+                require(model == "gpt-6.1-sol", f"{relative}: unsupported Sol model {model}")
+        return text
 
     def mapping(relative: str, parser) -> dict:
         try:

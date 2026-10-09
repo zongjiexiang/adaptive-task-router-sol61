@@ -1,6 +1,6 @@
 {
   "name": "adaptive-task-router",
-  "version": "0.2.1+afd2.sol61.20261009.1",
+  "version": "0.2.2+afd2.sol61.20261009.1",
   "description": "一次启用后在当前对话持续按难点选型，协调原生递归子代理并核验结果。",
   "author": {
     "name": "wei-er582"
