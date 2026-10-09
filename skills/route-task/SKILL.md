@@ -3,9 +3,9 @@ name: route-task
 description: "明确调用后，在当前对话持续按任务分析目标、选择模型和推理等级、协调原生子代理并验收；后续请求无需再次勾选。支持有收益的递归委派。仅讨论或引用插件不启用；遵守单次例外、关闭与计划模式。"
 metadata:
   status: active
-  owner: Samsung
-  last_verified: "2026-09-23"
-  verified_commit: "adaptive-task-router-v0.2.0"
+  owner: AFD 2.0
+  last_verified: "2026-10-09"
+  verified_commit: "adaptive-task-router-0.2.1+afd2.sol61.20261009.1"
   applies_to: "adaptive-task-router"
 ---
 
@@ -35,6 +35,8 @@ metadata:
 
 补齐完成目标所需的验证与整合。额外功能、架构扩建和新的外部操作仅作建议。领域技能负责其专业流程，本技能负责选型与协调；向执行者传递适用的领域规则，不替代它们。
 
+用于 AFD 2.0 开发或维护时，在拆分与首次副作用前读取[AFD 适配](references/afd-integration.md)，结合实际项目入口和当前节点确定有效授权、实施权、预算及验收。仅提到 AFD 或读取本文件不授予项目权限；已核验且未变化的上下文直接复用，不重复加载历史。
+
 ## 按难点选型
 
 确有选型需要时读取[模型选型参考](references/model-routing.md)。遇到 Astra XHigh/Max、Ultra 或难以验收的关键判断，再读[高档配置](references/high-effort-orchestration.md)。15 个基础组合和 2 个 Ultra 选项是可调整的起点，不是能力保证。
@@ -49,7 +51,7 @@ metadata:
 
 真正分派前读[原生接口](references/native-dispatch.md)；复杂、递归、共享资源、变更或停止恢复时读[协调协议](references/recursive-orchestration.md)。按任务需要读取，不每轮加载整套参考。
 
-分派明确目标、输入及版本、依赖、允许操作的范围、配置理由、交付、验收、停止条件和名额。当前工具使用显式 `model`、`reasoning_effort` 与 `fork_turns: "none"`，传入必要规则和持续启用状态。
+分派明确目标、输入及版本、依赖、允许操作的范围、配置理由、交付、验收、停止条件和名额。先核对当次原生 schema；支持时显式提交 `model` 和 `reasoning_effort`，默认优先隔离上下文（如支持的 `fork_turns: "none"`），传入必要规则和持续启用状态。角色选择、参数覆盖与运行回显按原生接口处理，不把示例字段当成所有宿主的必需参数。
 
 整棵树共用宿主容量及用户限制，不设插件固定三个上限。主代理统一分配名额；子代理在分配范围内可以自主选型并继续委派，无需逐次询问用户。没有进一步分派名额时自行做、排队或向主代理请求内部调整。每一级父代理都须满足工具关于有用独立工作的要求。
 

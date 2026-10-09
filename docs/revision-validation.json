@@ -1,0 +1,34 @@
+{
+  "version": "0.2.1+afd2.sol61.20261009.1",
+  "base_commit": "7fd3efb866e6f79cd0d3d14ea282635030cd53c2",
+  "performed_by": "implementation self-check, not independent review",
+  "local_regressions": {
+    "command": "python -B -m unittest discover -s tests -p 'test_*.py' -v",
+    "python": "3.13.5",
+    "platform": "Linux",
+    "tests": 27,
+    "exit_code": 0,
+    "scope": "Deterministic checker tests on synthetic temporary packages. No Codex or business I/O."
+  },
+  "local_full_package_check": {
+    "status": "not_run",
+    "reason": "Network clone unavailable in this environment; do not equate fixture checks with full repository audit."
+  },
+  "remote_ci": {
+    "status": "not_asserted",
+    "evidence": "Check the workflow run for the final candidate commit."
+  },
+  "native_scenarios": {
+    "AFD-01": "not_run",
+    "AFD-02": "not_run",
+    "AFD-03": "not_run",
+    "AFD-04": "not_run",
+    "AFD-05": "not_run",
+    "AFD-06": "not_run",
+    "AFD-07": "not_run",
+    "AFD-08": "not_run"
+  },
+  "runtime_reason": "No native Codex execution or user-host installation performed in this change.",
+  "checker_sha256": "a1be3661961a76f82acbe9909a619ed163a1570c542967d84057a3df0c084df8",
+  "regressions_sha256": "95d3393e62b11c70b6a436a0e6b0cbb231cb8832543c90a202055c5a8172817f"
+}
