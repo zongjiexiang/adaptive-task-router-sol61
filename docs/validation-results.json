@@ -1,0 +1,91 @@
+{
+  "complete_package": {
+    "exit_code": 0,
+    "result": {
+      "passed": true,
+      "documents": 15,
+      "local_links": 27,
+      "model_options": 17,
+      "failures": []
+    }
+  },
+  "different_clone_directory": {
+    "exit_code": 0,
+    "result": {
+      "passed": true,
+      "documents": 15,
+      "local_links": 27,
+      "model_options": 17,
+      "failures": []
+    }
+  },
+  "reject_old_sol": {
+    "exit_code": 1,
+    "result": {
+      "passed": false,
+      "documents": 15,
+      "local_links": 27,
+      "model_options": 16,
+      "failures": [
+        "17-option coverage differs"
+      ]
+    }
+  },
+  "reject_other_source": {
+    "exit_code": 1,
+    "result": {
+      "passed": false,
+      "documents": 15,
+      "local_links": 27,
+      "model_options": 17,
+      "failures": [
+        "local source must resolve to this complete package"
+      ]
+    }
+  },
+  "reject_wrong_identity": {
+    "exit_code": 1,
+    "result": {
+      "passed": false,
+      "documents": 15,
+      "local_links": 27,
+      "model_options": 17,
+      "failures": [
+        "plugin identity differs",
+        "marketplace/plugin identity differs"
+      ]
+    }
+  },
+  "restored_copy": {
+    "exit_code": 0,
+    "result": {
+      "passed": true,
+      "documents": 15,
+      "local_links": 27,
+      "model_options": 17,
+      "failures": []
+    }
+  },
+  "original_skill_capabilities_preserved": true,
+  "single_skill_checker": {
+    "passed": false,
+    "scope": "single skill directory",
+    "findings": [
+      "route-task: ../suggest-task-routing/SKILL.md is outside the single skill root",
+      "suggest-task-routing: ../route-task/SKILL.md is outside the single skill root"
+    ],
+    "interpretation": "The full plugin packages both skills; its package-level link check passed. Original cross-skill links remain intact."
+  },
+  "native_catalog": {
+    "client": "codex-cli 0.162.0-alpha.2",
+    "marketplace": "afd2-sol61",
+    "plugin": "adaptive-task-router",
+    "version": "0.2.0+afd2.sol61.20261009.2",
+    "source": "local package root",
+    "catalog_errors": [],
+    "installed": false,
+    "enabled": false,
+    "skills_found": 0,
+    "scope": "Catalog discovery passed. A process-only enable request did not install or expose skills; project enablement and actual model execution were not performed."
+  }
+}

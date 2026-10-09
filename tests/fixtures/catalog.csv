@@ -1,0 +1,13 @@
+sku,category,stock,status,currency
+A01,book,12,active,CNY
+A02,book,5,draft,CNY
+A03,tool,0,active,CNY
+A04,tool,8,active,CNY
+A05,book,3,archived,CNY
+A06,tool,14,active,CNY
+A07,book,2,active,CNY
+A08,tool,1,draft,CNY
+A09,book,9,active,CNY
+A10,tool,4,active,CNY
+A11,book,6,archived,CNY
+A12,tool,7,active,CNY

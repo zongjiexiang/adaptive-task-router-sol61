@@ -1,0 +1,20 @@
+{
+  "name": "afd2-sol61",
+  "interface": {
+    "displayName": "AFD 2.0 · 智能任务调度"
+  },
+  "plugins": [
+    {
+      "name": "adaptive-task-router",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

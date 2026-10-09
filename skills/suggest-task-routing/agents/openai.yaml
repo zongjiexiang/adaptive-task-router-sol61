@@ -1,0 +1,6 @@
+interface:
+  display_name: "智能调度建议"
+  short_description: "尚未启用时评估复杂任务的分工收益，仅建议开启并在当前对话持续使用"
+  default_prompt: "请使用 $suggest-task-routing 判断本任务是否值得启用智能任务调度，只给建议。"
+policy:
+  allow_implicit_invocation: true

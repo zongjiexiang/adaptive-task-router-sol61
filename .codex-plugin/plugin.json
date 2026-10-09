@@ -1,0 +1,32 @@
+{
+  "name": "adaptive-task-router",
+  "version": "0.2.0+afd2.sol61.20261009.2",
+  "description": "一次启用后在当前对话持续按难点选型，协调原生递归子代理并核验结果。",
+  "author": {
+    "name": "wei-er582"
+  },
+  "skills": "./skills/",
+  "keywords": [
+    "task-routing",
+    "subagents",
+    "reasoning",
+    "quality",
+    "任务调度"
+  ],
+  "interface": {
+    "displayName": "智能任务调度",
+    "shortDescription": "对话内持续选型，按宿主容量递归分派并验收。",
+    "longDescription": "明确启用后在本对话持续分析、选型、分派与验收；尚未启用时只在明显有收益的复杂任务中建议。分支在共享名额内按需递归，支持单次例外、关闭、停止与恢复。使用 Codex 原生能力，不修改全局模型或 Ultra 映射。",
+    "developerName": "wei-er582",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "请使用 $route-task 完成下面的任务，并在当前对话后续请求中持续按需分析、选型、分派与验收。",
+      "请使用 $route-task 只分析任务、依赖、选型和验收方案，暂不执行。",
+      "请使用 $suggest-task-routing 判断本任务是否值得启用多模型调度，只给建议。"
+    ]
+  }
+}

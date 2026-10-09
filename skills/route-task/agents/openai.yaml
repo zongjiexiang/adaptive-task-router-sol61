@@ -1,0 +1,6 @@
+interface:
+  display_name: "智能任务调度"
+  short_description: "一次启用后在本对话持续按难点选型，协调递归子代理并核验交付结果"
+  default_prompt: "请使用 $route-task 完成以下任务，并在本对话后续请求中持续按需分析、选型、分派与验收。"
+policy:
+  allow_implicit_invocation: false
