@@ -262,6 +262,106 @@ class PackageTests(unittest.TestCase):
         return subprocess.run([sys.executable, "-B", "-c", code, tests_dir, str(self.root)],
                               capture_output=True, text=True, timeout=10, check=False)
 
+    def test_escaped_sol_in_parsed_resources_rejected(self):
+        invalid = "gpt-unsupported-sol"
+        escaped = r"gpt-unsupported-\u0073ol"
+        for relative in (".codex-plugin/plugin.json", "skills/route-task/agents/openai.yaml",
+                         "skills/route-task/SKILL.md"):
+            with self.subTest(relative=relative):
+                path = self.root / relative
+                original = path.read_text()
+                try:
+                    if path.suffix == ".json":
+                        value = json.loads(original)
+                        value["interface"] = {"defaultPrompt": [invalid]}
+                        text = json.dumps(value).replace(invalid, escaped)
+                    elif path.suffix == ".yaml":
+                        value = yaml.safe_load(original)
+                        value["interface"]["default_prompt"] += " " + invalid
+                        text = yaml.safe_dump(value, default_style='"').replace(invalid, escaped)
+                    else:
+                        text = original.replace("\n---\n", f'\noptions: ["{escaped}"]\n---\n', 1)
+                    self.put(relative, text)
+                    run = self.run_cli()
+                    self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                    self.assertIn(f"{relative}: unsupported Sol model", run.stdout)
+                finally:
+                    path.write_text(original)
+
+    def test_all_package_configuration_formats_checked(self):
+        for relative, template in (
+            ("configs/roles.json", '{"roles": [{"model": "MODEL"}]}'),
+            ("configs/roles.yaml", 'roles:\n  - model: "MODEL"\n'),
+            ("configs/roles.YML", 'roles:\n  - model: "MODEL"\n'),
+            (".codex/agents/reviewer.toml", '[[roles]]\nmodel = "MODEL"\n'),
+        ):
+            with self.subTest(relative=relative):
+                path = self.root / relative
+                try:
+                    for model, expected in ((r"gpt-6.1-\u0073ol", 0),
+                                            (r"gpt-unsupported-\u0073ol", 1)):
+                        self.put(relative, template.replace("MODEL", model))
+                        run = self.run_cli()
+                        self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+                        self.assertEqual(json.loads(run.stdout)["passed"], expected == 0)
+                finally:
+                    path.unlink()
+
+    def test_linked_role_configuration_checked(self):
+        self.put("skills/route-task/references/role.yaml", "model: gpt-unsupported-sol\n")
+        skill = self.root / "skills/route-task/SKILL.md"
+        skill.write_text(skill.read_text() + "\n[Role](references/role.yaml)\n")
+        run = self.run_cli()
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("references/role.yaml: unsupported Sol model", run.stdout)
+
+    def test_malformed_extra_configuration_rejected(self):
+        for suffix, text in (("json", "{"), ("yaml", "model: ["),
+                             ("yml", "model: ["), ("toml", "model = [")):
+            with self.subTest(suffix=suffix):
+                relative = f"configs/role.{suffix}"
+                self.put(relative, text)
+                try:
+                    run = self.run_cli()
+                    self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                    self.assertIn(f"{relative}: invalid data", run.stdout)
+                finally:
+                    (self.root / relative).unlink()
+
+    def test_yaml_recursive_aliases_are_bounded(self):
+        relative = "configs/role.yaml"
+        for model, expected in (("gpt-6.1-sol", 0), (r"gpt-unsupported-\u0073ol", 1)):
+            self.put(relative, f'role: &role\n  self: *role\n  model: "{model}"\n')
+            run = self.run_cli()
+            self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+            self.assertEqual(json.loads(run.stdout)["passed"], expected == 0)
+
+    def test_external_configuration_symlinks_rejected(self):
+        with tempfile.TemporaryDirectory(prefix="router-outside-") as outside:
+            outside = Path(outside)
+            (outside / "role.toml").write_text('model = "gpt-unsupported-sol"\n')
+            for name, target in (("role.toml", outside / "role.toml"), ("roles", outside)):
+                with self.subTest(name=name):
+                    link = self.root / name
+                    link.symlink_to(target, target_is_directory=target.is_dir())
+                    try:
+                        run = self.run_cli()
+                        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                        self.assertIn("escapes package", run.stdout)
+                        self.assertNotIn("unsupported Sol model", run.stdout)
+                    finally:
+                        link.unlink()
+
+    def test_unsupported_configuration_formats_rejected(self):
+        for suffix in ("json5", "jsonc", "ini", "cfg", "conf"):
+            with self.subTest(suffix=suffix):
+                relative = f"configs/role.{suffix}"
+                self.put(relative, 'model = "gpt-6.1-sol"\n')
+                try:
+                    self.assert_failure(f"{relative}: unsupported configuration format")
+                finally:
+                    (self.root / relative).unlink()
+
     def test_cli_rejects_option_without_leading_pipe(self):
         self.put("skills/route-task/references/model-routing.md", governed(
             MODEL_TABLE + "`invalid-model` | `high` | extra |\n"))

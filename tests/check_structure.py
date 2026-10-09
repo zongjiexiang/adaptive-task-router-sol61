@@ -5,11 +5,15 @@ import json
 from pathlib import Path
 import re
 import sys
+import tomllib
 
 import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PARSERS = {".json": json.loads, ".yaml": yaml.safe_load,
+                  ".yml": yaml.safe_load, ".toml": tomllib.loads}
+UNSUPPORTED_CONFIG_SUFFIXES = {".json5", ".jsonc", ".ini", ".cfg", ".conf"}
 EXPECTED_OPTIONS = {
     (model, effort)
     for model in ("gpt-6-astra", "gpt-6.1-sol", "gpt-6-luna")
@@ -78,38 +82,65 @@ def audit_package(root: Path) -> dict:
     failures: list[str] = []
     document_count = 0
     link_count = 0
+    configurations: dict[str, object] = {}
 
     def require(condition: bool, message: str) -> None:
         if not condition:
             failures.append(message)
 
+    def check_models(relative: str, value: object) -> None:
+        pending, visited = [value], set()
+        while pending:
+            item = pending.pop()
+            if isinstance(item, str):
+                for model in sorted(set(re.findall(r"\bgpt-[a-z0-9]+(?:[.-][a-z0-9]+)*\b", item))):
+                    if "sol" in model.split("-"):
+                        require(model == "gpt-6.1-sol", f"{relative}: unsupported Sol model {model}")
+            elif isinstance(item, (dict, list, tuple, set)) and id(item) not in visited:
+                # YAML aliases can share or cycle through containers.
+                visited.add(id(item))
+                if isinstance(item, dict):
+                    pending.extend(item.keys())
+                    pending.extend(item.values())
+                else:
+                    pending.extend(item)
+
     def read(relative: str) -> str:
         path = root / relative
-        if not path.resolve().is_relative_to(root):
-            failures.append(f"{relative}: file escapes package")
-            return ""
         try:
+            if not path.resolve().is_relative_to(root):
+                failures.append(f"{relative}: file escapes package")
+                return ""
             text = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeError) as error:
+        except (OSError, UnicodeError, RuntimeError) as error:
             failures.append(f"{relative}: {type(error).__name__}")
             return ""
-        for model in sorted(set(re.findall(r"\bgpt-[a-z0-9]+(?:[.-][a-z0-9]+)*\b", text))):
-            if "sol" in model.split("-"):
-                require(model == "gpt-6.1-sol", f"{relative}: unsupported Sol model {model}")
+        check_models(relative, text)
         return text
 
-    def mapping(relative: str, parser) -> dict:
+    def parsed(relative: str, text: str, parser) -> object:
         try:
-            value = parser(read(relative))
-        except (ValueError, yaml.YAMLError) as error:
+            value = parser(text)
+        except (ValueError, yaml.YAMLError, RecursionError) as error:
             failures.append(f"{relative}: invalid data ({type(error).__name__})")
             return {}
+        check_models(relative, value)
+        return value
+
+    def configuration(relative: str) -> object:
+        if relative not in configurations:
+            configurations[relative] = parsed(relative, read(relative),
+                                               CONFIG_PARSERS[Path(relative).suffix.lower()])
+        return configurations[relative]
+
+    def mapping(relative: str) -> dict:
+        value = configuration(relative)
         if not isinstance(value, dict):
             failures.append(f"{relative}: expected mapping")
             return {}
         return value
 
-    manifest = mapping(".codex-plugin/plugin.json", json.loads)
+    manifest = mapping(".codex-plugin/plugin.json")
     require(manifest.get("name") == "adaptive-task-router", "plugin identity differs")
     version = manifest.get("version", "")
     require(isinstance(version, str) and bool(re.fullmatch(
@@ -118,7 +149,7 @@ def audit_package(root: Path) -> dict:
     require(manifest.get("skills") == "./skills/", "skills discovery path differs")
     require(not any(k in manifest for k in ("apps", "mcpServers")), "unexpected runtime dependency")
 
-    marketplace = mapping(".agents/plugins/marketplace.json", json.loads)
+    marketplace = mapping(".agents/plugins/marketplace.json")
     require(marketplace.get("name") == "afd2-sol61", "local marketplace identity differs")
     entries = marketplace.get("plugins")
     if not isinstance(entries, list) or len(entries) != 1 or not isinstance(entries[0], dict):
@@ -134,7 +165,7 @@ def audit_package(root: Path) -> dict:
     require(read("LICENSE").startswith("MIT License"), "missing MIT license")
 
     for name, implicit in (("route-task", False), ("suggest-task-routing", True)):
-        ui = mapping(f"skills/{name}/agents/openai.yaml", yaml.safe_load)
+        ui = mapping(f"skills/{name}/agents/openai.yaml")
         policy, interface = ui.get("policy"), ui.get("interface")
         policy = policy if isinstance(policy, dict) else {}
         interface = interface if isinstance(interface, dict) else {}
@@ -145,17 +176,36 @@ def audit_package(root: Path) -> dict:
                 f"{name}: UI description length")
         require((root / f"skills/{name}/SKILL.md").is_file(), f"{name}: missing SKILL.md")
 
-    for path in sorted(root.rglob("*.md")):
+    for path in sorted(root.rglob("*")):
         if ".git" in path.relative_to(root).parts:
             continue
         rel = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            try:
+                if not path.resolve().is_relative_to(root):
+                    failures.append(f"{rel}: file escapes package")
+                    continue
+            except (OSError, RuntimeError) as error:
+                failures.append(f"{rel}: {type(error).__name__}")
+                continue
+        if not path.is_file():
+            continue
+        suffix = path.suffix.lower()
+        if suffix in CONFIG_PARSERS:
+            configuration(rel)
+            continue
+        if suffix in UNSUPPORTED_CONFIG_SUFFIXES:
+            failures.append(f"{rel}: unsupported configuration format")
+            continue
+        if suffix != ".md":
+            continue
         text = read(rel)
+        header_match = re.match(r"\A---\n(.*?)\n---(?:\n|$)", text, re.S)
+        header = parsed(rel, header_match.group(1), yaml.safe_load) if header_match else {}
         if not rel.startswith("tests/fixtures/"):
-            header_match = re.match(r"\A---\n(.*?)\n---(?:\n|$)", text, re.S)
             require(header_match is not None, f"{rel}: missing metadata")
             if header_match:
                 try:
-                    header = yaml.safe_load(header_match.group(1))
                     if not isinstance(header, dict):
                         raise ValueError("expected mapping")
                     governed = header.get("metadata", header)

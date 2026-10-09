@@ -2,7 +2,7 @@
 status: active
 owner: AFD 2.0
 last_verified: 2026-10-09
-verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
+verified_commit: "adaptive-task-router-0.2.3+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
@@ -13,7 +13,7 @@ supersedes: []
 
 ## 保留完整源码与固定版本
 
-保留隐藏的 `.codex-plugin` 和 `.agents`。通过 `codex --version`、`codex plugin --help` 确认实际客户端能力；结构检查需要 Python 3.10+ 和 `requirements-dev.txt` 中的 PyYAML，插件执行不需要 Python 服务。
+保留隐藏的 `.codex-plugin` 和 `.agents`。通过 `codex --version`、`codex plugin --help` 确认实际客户端能力；结构检查需要 Python 3.11+（使用标准库 TOML 解析器）和 `requirements-dev.txt` 中的 PyYAML，完整回归还需要 Git 与 Bash。插件执行不需要 Python 服务。
 
 本包市场名为 `afd2-sol61`，插件 ID 为 `adaptive-task-router@afd2-sol61`；自带市场的本地 source.path 为 `.`，以完整包根为基准。固定实际候选提交和清单版本，避免从另一个远程来源安装同名插件。
 

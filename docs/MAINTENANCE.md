@@ -2,7 +2,7 @@
 status: active
 owner: AFD 2.0
 last_verified: 2026-10-09
-verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
+verified_commit: "adaptive-task-router-0.2.3+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
@@ -34,9 +34,13 @@ python3 -B tests/check_structure.py
 python3 -B -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-开发依赖按 `requirements-dev.txt` 安装。结构检查覆盖清单、市场、技能入口、包内引用及完整模型表；支持表格首尾竖线省略，先解析全部选项再拒绝未知、重复和缺失项；读取技能、清单与选择器配置时也拒绝其他 Sol 型号。回归测试使用合成临时目录，不调用模型、认证或业务。
+使用 Python 3.11+、Git、Bash，开发依赖按 `requirements-dev.txt` 安装。结构检查覆盖清单、市场、技能入口、包内引用及完整模型表；支持表格首尾竖线省略，先解析全部选项再拒绝未知、重复和缺失项。
 
-CI 执行相同命令及 `git diff --check`。包级检查、单 Skill 验证器、原生加载和实际模型行为是不同结论。详见[核验记录](VALIDATION.md)。
+型号检查同时读取原文与解析后的字符串，包括 Markdown front matter，以及整个包内的 `.json`、`.yaml`、`.yml`、`.toml`（后缀大小写均可）。新增角色、未引用配置及技能链接到的上述配置都进入检查；嵌套列表、映射和 YAML 循环别名有界遍历。损坏配置以及尚未支持的 `.json5`、`.jsonc`、`.ini`、`.cfg`、`.conf` 明确失败；引入新配置格式前须增加解析规则和反例。该范围不包含任意脚本、模板或运行时动态生成的配置。
+
+检查跳过 `.git`，拒绝越过包边界的符号链接，不读取宿主全局配置或外部角色。回归测试使用合成临时目录，不调用模型、认证或业务；外部角色和实际加载仍须原生验证。
+
+CI 执行相同命令，并以事件中的明确对象检查已提交差异：PR 使用 base/head SHA，push 使用 before/head SHA；首次 push 或手动运行没有基线时，以空树比较整个候选。取得完整历史，旧基线对象缺失时尝试获取，仍不可用则失败；另保留工作树差异检查。事件字段见 [GitHub 官方上下文说明](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts)。包级检查、单 Skill 验证器、原生加载和实际模型行为是不同结论。详见[核验记录](VALIDATION.md)。
 
 ## 行为验收与校准
 

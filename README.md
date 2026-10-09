@@ -2,7 +2,7 @@
 status: active
 owner: AFD 2.0
 last_verified: 2026-10-09
-verified_commit: "adaptive-task-router-0.2.2+afd2.sol61.20261009.1"
+verified_commit: "adaptive-task-router-0.2.3+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
@@ -11,7 +11,7 @@ supersedes: []
 
 可独立阅读、审查和安装的 Codex 多代理协作插件。不需要其他版本或差异补丁；业务项目资料只在处理相应项目任务时按需读取。
 
-当前版本：`0.2.2+afd2.sol61.20261009.1`。状态：AFD 接入优化候选；本次不修改 AFD 业务仓库，不代表已经安装、接入生产或通过真实多代理验收。实际检查与未测范围见[核验记录](docs/VALIDATION.md)。
+当前版本：`0.2.3+afd2.sol61.20261009.1`。状态：AFD 接入优化候选；本次不修改 AFD 业务仓库，不代表已经安装、接入生产或通过真实多代理验收。实际检查与未测范围见[核验记录](docs/VALIDATION.md)。
 
 ## 从哪里开始
 
