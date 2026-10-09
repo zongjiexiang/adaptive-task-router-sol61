@@ -1,8 +1,8 @@
 ---
 status: active
-owner: wei-er582
-last_verified: 2026-09-23
-verified_commit: "adaptive-task-router-public-2026-09-23"
+owner: AFD 2.0
+last_verified: 2026-10-09
+verified_commit: "adaptive-task-router-0.2.3+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
@@ -19,15 +19,16 @@ supersedes: []
 
 ## 本地结构检查
 
-在仓库根目录运行，Python 3.10+：
+在仓库根目录运行，需要 Python 3.11+、Git 和 Bash：
 
 ```sh
-python -m pip install -r requirements-dev.txt
-python tests/check_structure.py
+python3 -m pip install -r requirements-dev.txt
+python3 -B tests/check_structure.py
+python3 -B -m unittest discover -s tests -p 'test_*.py' -v
 git diff --check
 ```
 
-随包 GitHub Actions 配置执行同一结构检查。Codex 内置的插件/技能验证器可用时额外运行，结果按 [维护说明](docs/MAINTENANCE.md) 分别记录。
+裸 `git diff --check` 只检查工作树；核验已提交内容时指定实际基线与候选：`git diff --check <base_sha> <head_sha>`。随包 GitHub Actions 执行结构、回归及事件对应的已提交差异检查。Codex 内置的插件/技能验证器可用时额外运行，结果按 [维护说明](docs/MAINTENANCE.md) 分别记录。
 
 检查结构通过不代表模型行为通过。涉及持续启用、递归、停止恢复或选型逻辑的修改，应从 [场景](tests/SCENARIOS.md) 中挑选受影响项目，分别记录静态审查、真实调用、模拟摘要及未运行项。
 

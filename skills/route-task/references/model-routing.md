@@ -1,13 +1,15 @@
 ---
 status: active
-owner: Samsung
-last_verified: 2026-09-23
-verified_commit: "adaptive-task-router-v0.2.0"
+owner: AFD 2.0
+last_verified: 2026-10-09
+verified_commit: "adaptive-task-router-0.2.3+afd2.sol61.20261009.1"
 applies_to: [adaptive-task-router]
 supersedes: []
 ---
 
 # 模型与推理等级起始策略
+
+Sol 系列仅使用 `gpt-6.1-sol`，不使用其他 Sol 型号或将其作为回退。Astra/Luna 的动态选型能力保留；主线程配置仍由用户和宿主决定。
 
 用途：为已明确的子任务选择够用的模型和推理投入。复杂高档组合同时参考[高档配置](high-effort-orchestration.md)。本表综合用户提供的选型对话与官方模型定位，是工作策略，不是逐档实测结论。不能据此声称固定成功率、耗时、费用倍率或跨模型能力等价。
 

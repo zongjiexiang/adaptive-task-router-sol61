@@ -1,0 +1,87 @@
+{
+  "version": "0.2.3+afd2.sol61.20261009.1",
+  "base_commit": "8259206b38e722e266a32b2704e8e5b4551098ed",
+  "performed_by": "implementation self-check, not independent review",
+  "local_regressions": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py' -v",
+    "python": "3.14.7",
+    "platform": "Darwin",
+    "tests": 42,
+    "exit_code": 0,
+    "scope": "Deterministic configuration/CLI checks and actual workflow shell commands on temporary Git repositories. No Codex or business I/O.",
+    "before_fix": {
+      "tests": 42,
+      "failed_subcases": 25,
+      "exit_code": 1
+    }
+  },
+  "local_full_package_check": {
+    "command": "python3 -B tests/check_structure.py",
+    "exit_code": 0,
+    "passed": true,
+    "documents": 16,
+    "local_links": 35,
+    "model_options": 17,
+    "failures": []
+  },
+  "diff_check": {
+    "command": "git diff --check 8259206b38e722e266a32b2704e8e5b4551098ed",
+    "exit_code": 0,
+    "scope": "Previous candidate to final working tree, including staged new files."
+  },
+  "sol_policy": {
+    "allowed_model": "gpt-6.1-sol",
+    "obsolete_identifier_matches_in_current_tree": 0,
+    "git_history_rewritten": false
+  },
+  "remote_ci": {
+    "status": "not_asserted_at_source_commit",
+    "evidence": "Check the workflow run for the final candidate commit."
+  },
+  "native_scenarios": {
+    "AFD-01": "not_run",
+    "AFD-02": "not_run",
+    "AFD-03": "not_run",
+    "AFD-04": "not_run",
+    "AFD-05": "not_run",
+    "AFD-06": "not_run",
+    "AFD-07": "not_run",
+    "AFD-08": "not_run"
+  },
+  "runtime_reason": "No native Codex execution or user-host installation performed in this change.",
+  "checker_sha256": "20ea0be422b6d2910646f6f864a303d9d5caff9fab103581c000607c38d1c5ff",
+  "regressions_sha256": "1d0b666e4bd4d1c25d4bd2fcc832ad19adb70543207e9d04e30d5e1e0a90a846",
+  "pro_probe_replay": {
+    "performed_by": "implementation, not a new independent Pro review",
+    "script_unchanged": true,
+    "cases": 21,
+    "before_unexpected_acceptances": 4,
+    "after_expectations_met": 21,
+    "exit_code": 0,
+    "included_in_unittest_count": false,
+    "probe_sha256": "c9fc3fad21e202208735a0193405a0a5f811c06943fd2c7e7d5b12e1cdb915c3"
+  },
+  "configuration_scope": {
+    "formats": [
+      ".json",
+      ".yaml",
+      ".yml",
+      ".toml"
+    ],
+    "case_insensitive_extensions": true,
+    "decoded_strings_and_front_matter": true,
+    "all_package_paths": true,
+    "external_symlinks": "rejected",
+    "unsupported_formats": [
+      ".json5",
+      ".jsonc",
+      ".ini",
+      ".cfg",
+      ".conf"
+    ],
+    "git_history_and_host_configuration": "not_read",
+    "dynamic_runtime_configuration": "not_verified"
+  },
+  "ci_regressions_sha256": "ab2fe1042e20f1766cdc17ad2f830111d8aafb736f03a93e552b29862b9d4c18",
+  "workflow_sha256": "1ebc689d70895fdffbb7eda8e8959827e8cdb0c0201f708f2621391682666eff"
+}
